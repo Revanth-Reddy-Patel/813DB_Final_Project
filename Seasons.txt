@@ -1,0 +1,7 @@
+begin %MLPQ% 
+
+Seasons(id,Name,t)  :- id=1, Name='Kharif', t>=6, t<=11.
+Seasons(id,Name,t)  :- id=2, Name='Rabi', t=12, t>=1, t<=3.
+Seasons(id,Name,t)  :- id=3, Name='Zaid', t>=4, t<6.
+
+end %MLPQ% 
