@@ -1,18 +1,18 @@
 begin %MLPQ% 
-Crops(id,Name,Type)  :- id=1, Type='Food', Name='Paddy'.
-Crops(id,Name,Type)  :- id=2, Type='Food', Name='Wheat'.
-Crops(id,Name,Type)  :- id=3, Type='Food', Name='Jowar'.
-Crops(id,Name,Type)  :- id=4, Type='Food', Name='Bajra'.
-Crops(id,Name,Type)  :- id=5, Type='Food', Name='Maize'.
-Crops(id,Name,Type)  :- id=6, Type='Food', Name='Ragi'.
-Crops(id,Name,Type)  :- id=7, Type='Food', Name='Barley'.
-Crops(id,Name,Type)  :- id=8, Type='Food', Name='Sugarcane'.
+Crops(id,Name,Type)  :- id=1, Type="Food", Name="Paddy".
+Crops(id,Name,Type)  :- id=2, Type="Food", Name="Wheat".
+Crops(id,Name,Type)  :- id=3, Type="Food", Name="Jowar".
+Crops(id,Name,Type)  :- id=4, Type="Food", Name="Bajra".
+Crops(id,Name,Type)  :- id=5, Type="Food", Name="Maize".
+Crops(id,Name,Type)  :- id=6, Type="Food", Name="Ragi".
+Crops(id,Name,Type)  :- id=7, Type="Food", Name="Barley".
+Crops(id,Name,Type)  :- id=8, Type="Food", Name="Sugarcane".
 
-Crops(id,Name,Type)  :- id=9, Type='Commercial', Name='Groundnut'.
-Crops(id,Name,Type)  :- id=10, Type='Commercial', Name='Sesamum'.
-Crops(id,Name,Type)  :- id=11, Type='Commercial', Name='Castor'.
-Crops(id,Name,Type)  :- id=12, Type='Commercial', Name='Linseed'.
-Crops(id,Name,Type)  :- id=13, Type='Commercial', Name='Cotton'.
-Crops(id,Name,Type)  :- id=14, Type='Commercial', Name='Jute'.
+Crops(id,Name,Type)  :- id=9, Type="Commercial", Name="Groundnut".
+Crops(id,Name,Type)  :- id=10, Type="Commercial", Name="Sesamum".
+Crops(id,Name,Type)  :- id=11, Type="Commercial", Name="Castor".
+Crops(id,Name,Type)  :- id=12, Type="Commercial", Name="Linseed".
+Crops(id,Name,Type)  :- id=13, Type="Commercial", Name="Cotton".
+Crops(id,Name,Type)  :- id=14, Type="Commercial", Name="Jute".
 
 end %MLPQ% 
