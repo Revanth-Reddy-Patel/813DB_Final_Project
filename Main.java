@@ -1,7 +1,10 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 class Crop {
     String name; // space
@@ -45,26 +48,130 @@ class XAndY {
         return this.x;
     }
 
+}
 
-//    @Override
-//    public int compareTo(XAndY e) {
-//        return this.getX().compareTo(e.getX());
-//    }
-
+class Cultivation {
+    int stateId;
+    int cropId;
+    int year;
+    int yield;
+    int price;
 }
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        // X: [] Year
-        // Y: [] Yield
-        // tolerance: max -min /10
+        int totalCrops = 5;
 
-        // X: [] Year
-        // Y: [] Price
-        // tolerance: max -min /10
+        GenerateCultivationRelation();
 
-        int startYear = 2011;
+        GeneratePiecewiseReference(totalCrops);
+
+    }
+
+    static void GeneratePiecewiseReference(int totalCrops) throws IOException {
+        Hashtable<Integer, State> states = GenerateStatesObject();
+        Hashtable<Integer, Crop> crops = GenerateCropRange();
+
+        List<Cultivation> completeData = ParseCultivationFile();
+        StringBuilder piecewiseData = new StringBuilder();
+
+        List<XAndY> allPriceValues = new ArrayList<>();
+        List<XAndY> allYieldValues = new ArrayList<>();
+
+        StringBuilder matlabInput = new StringBuilder();
+
+        Map<Integer, Map<Integer, List<Cultivation>>> dataByCropIdAndStateId = completeData.stream()
+                .collect(Collectors.groupingBy(c -> c.cropId,
+                        Collectors.groupingBy(c -> c.stateId,
+                                Collectors.mapping((Cultivation c) -> c, toList()))));
+
+        for (int i = 1; i <= totalCrops; i++) { // each crop
+            Map<Integer, List<Cultivation>> dataByState = dataByCropIdAndStateId.get(i);
+            piecewiseData.append("\nCrop:" + i);
+            piecewiseData.append("|" + crops.get(i).name);
+            piecewiseData.append("\n****************************************************************");
+
+            for (int j = 1; j <= 13; j++) { // each state
+                piecewiseData.append("\nState:" + j);
+                piecewiseData.append("|" + states.get(j).name);
+                piecewiseData.append("\n---------");
+                List<Cultivation> data = dataByState.get(j);
+                List<XAndY> xAndYList = new ArrayList<>();
+                List<XAndY> xAndZList = new ArrayList<>();
+
+                for (Cultivation cultivation : data) {
+                    int x = cultivation.year;
+                    int y = cultivation.price;
+                    int z = cultivation.yield;
+                    xAndYList.add(new XAndY(x, y));
+                    xAndZList.add(new XAndY(x, z));
+                }
+                allPriceValues.addAll(SortingByX(xAndYList));
+                allYieldValues.addAll(SortingByX(xAndZList));
+
+                piecewiseData.append("\nPrice: " + MakeString(SortingByX(xAndYList)));
+                piecewiseData.append("\nYield" + MakeString(SortingByX(xAndZList)));
+            }
+        }
+        matlabInput.append(MakeString(allPriceValues));
+        matlabInput.append(MakeString(allYieldValues));
+
+        WriteToFile(matlabInput.toString(), "matlabInput.txt");
+
+        WriteToFile(piecewiseData.toString(), "piecewiseData.txt");
+    }
+
+    private static Cultivation convertToCultivationObject(String line) {
+        Cultivation obj = new Cultivation();
+        List<String> allMatches = new ArrayList<>();
+
+        StringBuilder string = new StringBuilder(line);
+        string.setCharAt(line.trim().length() - 1, ',');
+
+        Matcher m = Pattern.compile("(?<==)(.*?)(?=,)")
+                .matcher(string);
+        while (m.find()) {
+            allMatches.add(m.group());
+        }
+        obj.stateId = Integer.parseInt(allMatches.get(0));
+        obj.cropId = Integer.parseInt(allMatches.get(1));
+        obj.year = Integer.parseInt(allMatches.get(2));
+        obj.yield = Integer.parseInt(allMatches.get(3));
+        obj.price = Integer.parseInt(allMatches.get(4));
+        return obj;
+    }
+
+    private static List<Cultivation> ParseCultivationFile() throws IOException {
+        BufferedReader bufferReader = null;
+        List<Cultivation> cultivationData = new ArrayList<>();
+
+        try {
+            bufferReader = new BufferedReader(new FileReader("Cultivation.txt"));
+            String line = bufferReader.readLine();
+            int lineNo = 1;
+            while (line != null) {
+                if (lineNo > 0) {
+                    Cultivation data = convertToCultivationObject(line);
+                    cultivationData.add(data);
+                }
+                line = bufferReader.readLine();
+                lineNo++;
+            }
+
+            System.out.println("Total Data :" + cultivationData.size());
+
+        } catch (IOException | NumberFormatException exception) {
+            System.out.println(exception.getMessage());
+        } finally {
+            bufferReader.close();
+        }
+
+        return cultivationData;
+    }
+
+    static void GenerateCultivationRelation() {
+        int startYear = 2017;
         int endYear = 2021;
         int loopYear = endYear;
 
@@ -72,21 +179,14 @@ public class Main {
         Hashtable<Integer, Crop> crops = GenerateCropRange();
 
         StringBuilder cultivationFile = new StringBuilder();
-        StringBuilder pieceWiseFile = new StringBuilder();
-
-        cultivationFile.append("begin %MLPQ% \n");
-
+//        cultivationFile.append("begin %MLPQ% \n");
         for (Map.Entry<Integer, Crop> crop : crops.entrySet()) {
             int cropId = crop.getKey();
             Crop cropValue = crop.getValue();
 
-            List<XAndY> xAndYValues_Crop_Price = new ArrayList<>();
-
             for (Map.Entry<Integer, State> state : states.entrySet()) {
                 int stateId = state.getKey();
                 State stateValue = state.getValue();
-
-                List<XAndY> xAndYValues_State_Yield = new ArrayList<>();
 
                 int min_avg_yield_StateAndCrop = (stateValue.minYieldValue + cropValue.minYieldValue) / 2;
                 int max_avg_yield_StateAndCrop = (stateValue.maxYieldValue + cropValue.maxYieldValue) / 2;
@@ -96,12 +196,6 @@ public class Main {
                     int yield = getRandomNumber(min_avg_yield_StateAndCrop, max_avg_yield_StateAndCrop);
                     int price = getRandomNumber(cropValue.minPriceValue, cropValue.maxPriceValue);
 
-                    // CROP
-                    xAndYValues_Crop_Price.add(new XAndY(loopYear, price));
-
-                    // STATE
-                    xAndYValues_State_Yield.add(new XAndY(loopYear, yield));
-
                     cultivationFile.append(GetLine(stateId,
                             cropId,
                             loopYear,
@@ -110,32 +204,39 @@ public class Main {
                     ));
                 }
                 loopYear = endYear;
-                pieceWiseFile.append("\n" + cropValue.name + ": X-Year, Y-Price\n" + MakeStringSortingByX(xAndYValues_Crop_Price));
-                pieceWiseFile.append("\n" + cropValue.name + ": X-Year, Y-Yield\n" + MakeStringSortingByX(xAndYValues_State_Yield));
             }
         }
-        cultivationFile.append("end %MLPQ% ");
+//        cultivationFile.append("end %MLPQ% ");
 
-//        WriteToFile(cultivationFile.toString(), "Cultivation.txt");
-
-        WriteToFile(pieceWiseFile.toString(), "Piecewise.txt");
+        WriteToFile(cultivationFile.toString(), "Cultivation.txt");
     }
 
-    private static StringBuilder MakeStringSortingByX(List<XAndY> xAndYValues) {
+    private static StringBuilder MakeString(List<XAndY> xAndYValues) {
         StringBuilder xAndYString = new StringBuilder();
 
-        xAndYString.append("X: [");
+        xAndYString.append("\nX: [");
         for (XAndY xValue : xAndYValues) {
-            xAndYString.append(xValue.x + ",");
+            xAndYString.append(xValue.x + " ");
         }
+        xAndYString.deleteCharAt(xAndYString.length() - 1);
+
         xAndYString.append("]\n");
 
         xAndYString.append("Y: [");
         for (XAndY yValue : xAndYValues) {
-            xAndYString.append(yValue.y + ",");
+            xAndYString.append(yValue.y + " ");
         }
+        xAndYString.deleteCharAt(xAndYString.length() - 1);
+
         xAndYString.append("]\n");
         return xAndYString;
+    }
+
+    private static List<XAndY> SortingByX(List<XAndY> xAndYValues) {
+        List<XAndY> xSorted;
+        xSorted = xAndYValues;
+        xSorted.sort(Comparator.comparingInt(XAndY::getX));
+        return xSorted;
     }
 
     private static Hashtable<Integer, Crop> GenerateCropRange() {
@@ -146,15 +247,6 @@ public class Main {
         CropIdAndName.put(3, new Crop("Jowar", 500, 2500, 150, 163));
         CropIdAndName.put(4, new Crop("Bajra", 900, 2500, 170, 195));
         CropIdAndName.put(5, new Crop("Maize", 1500, 7000, 145, 175));
-        CropIdAndName.put(6, new Crop("Ragi", 500, 2500, 210, 230));
-        CropIdAndName.put(7, new Crop("Barley", 1000, 2500, 150, 175));
-        CropIdAndName.put(8, new Crop("Sugarcane", 700, 3500, 100, 125));
-        CropIdAndName.put(9, new Crop("Groundnut", 800, 2000, 120, 170));
-        CropIdAndName.put(10, new Crop("Sesamum", 900, 1500, 160, 200));
-        CropIdAndName.put(11, new Crop("Castor", 1400, 4500, 90, 130));
-        CropIdAndName.put(12, new Crop("Linseed", 3000, 6000, 140, 175));
-        CropIdAndName.put(13, new Crop("Cotton", 1500, 2500, 95, 125));
-        CropIdAndName.put(14, new Crop("Jute", 3000, 4000, 180, 230));
 
         return CropIdAndName;
     }
@@ -184,7 +276,7 @@ public class Main {
     }
 
     static String GetLine(int stateId, int cropId, int year, int yield, int price) {
-        return String.format("Cultivation(StateID,CropID,Year,Yield)  :- StateID=%s, CropID=%s, Year=%s, Yield=%s, Price=%s. \n", stateId, cropId, year, yield, price);
+        return String.format("Cultivation(StateID,CropID,Year,Yield,Price) :- StateID=%s, CropID=%s, Year=%s, Yield=%s, Price=%s. \n", stateId, cropId, year, yield, price);
     }
 
     static void WriteToFile(String output, String fileName) {
@@ -204,5 +296,4 @@ public class Main {
             e.printStackTrace();
         }
     }
-
 }
