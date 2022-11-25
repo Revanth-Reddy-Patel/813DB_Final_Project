@@ -1,0 +1,59 @@
+begin %MLPQ%
+
+Impact(CropId, SeasonId, Favourable) :- CropId =1, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =1, SeasonId =2, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =1, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =2, SeasonId =1, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =2, SeasonId =2, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =2, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =3, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =3, SeasonId =2, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =3, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =4, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =4, SeasonId =2, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =4, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =5, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =5, SeasonId =2, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =5, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =6, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =6, SeasonId =2, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =6, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =7, SeasonId =1, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =7, SeasonId =2, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =7, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =8, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =8, SeasonId =2, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =8, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =9, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =9, SeasonId =2, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =9, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =10, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =10, SeasonId =2, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =10, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =11, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =11, SeasonId =2, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =11, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =12, SeasonId =1, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =12, SeasonId =2, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =12, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =13, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =13, SeasonId =2, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =13, SeasonId =3, Favourable="No".
+
+Impact(CropId, SeasonId, Favourable) :- CropId =14, SeasonId =1, Favourable="Yes".
+Impact(CropId, SeasonId, Favourable) :- CropId =14, SeasonId =2, Favourable="No".
+Impact(CropId, SeasonId, Favourable) :- CropId =14, SeasonId =3, Favourable="No".
+
+end %MLPQ%
