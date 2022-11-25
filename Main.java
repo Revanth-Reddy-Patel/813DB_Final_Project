@@ -1,8 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 class Crop {
     String name; // space
@@ -32,44 +31,111 @@ class State {
     }
 }
 
+class XAndY {
+    int x;
+    int y;
+
+    public XAndY(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    // Getter
+    public int getX() {
+        return this.x;
+    }
+
+
+//    @Override
+//    public int compareTo(XAndY e) {
+//        return this.getX().compareTo(e.getX());
+//    }
+
+}
+
 public class Main {
     public static void main(String[] args) {
 
+        // X: [] Year
+        // Y: [] Yield
+        // tolerance: max -min /10
+
+        // X: [] Year
+        // Y: [] Price
+        // tolerance: max -min /10
+
         int startYear = 2011;
         int endYear = 2021;
+        int loopYear = endYear;
 
         Hashtable<Integer, State> states = GenerateStatesObject();
         Hashtable<Integer, Crop> crops = GenerateCropRange();
 
-        StringBuilder finalContent = new StringBuilder();
-        finalContent.append("begin %MLPQ% \n");
+        StringBuilder cultivationFile = new StringBuilder();
+        StringBuilder pieceWiseFile = new StringBuilder();
 
-        for (; startYear <= endYear; startYear++) {
+        cultivationFile.append("begin %MLPQ% \n");
+
+        for (Map.Entry<Integer, Crop> crop : crops.entrySet()) {
+            int cropId = crop.getKey();
+            Crop cropValue = crop.getValue();
+
+            List<XAndY> xAndYValues_Crop_Price = new ArrayList<>();
 
             for (Map.Entry<Integer, State> state : states.entrySet()) {
                 int stateId = state.getKey();
                 State stateValue = state.getValue();
 
-                for (Map.Entry<Integer, Crop> crop : crops.entrySet()) {
-                    int cropId = crop.getKey();
-                    Crop cropValue = crop.getValue();
+                List<XAndY> xAndYValues_State_Yield = new ArrayList<>();
 
-                    int min_avg_yield_StateAndCrop = (stateValue.minYieldValue + cropValue.minYieldValue) / 2;
-                    int max_avg_yield_StateAndCrop = (stateValue.maxYieldValue + cropValue.maxYieldValue) / 2;
+                int min_avg_yield_StateAndCrop = (stateValue.minYieldValue + cropValue.minYieldValue) / 2;
+                int max_avg_yield_StateAndCrop = (stateValue.maxYieldValue + cropValue.maxYieldValue) / 2;
 
-                    finalContent.append(GetLine(stateId,
+                for (; loopYear >= startYear; loopYear--) {
+
+                    int yield = getRandomNumber(min_avg_yield_StateAndCrop, max_avg_yield_StateAndCrop);
+                    int price = getRandomNumber(cropValue.minPriceValue, cropValue.maxPriceValue);
+
+                    // CROP
+                    xAndYValues_Crop_Price.add(new XAndY(loopYear, price));
+
+                    // STATE
+                    xAndYValues_State_Yield.add(new XAndY(loopYear, yield));
+
+                    cultivationFile.append(GetLine(stateId,
                             cropId,
-                            startYear,
-                            getRandomNumber(min_avg_yield_StateAndCrop, max_avg_yield_StateAndCrop),
-                            getRandomNumber(cropValue.minPriceValue, cropValue.maxPriceValue)));
-
+                            loopYear,
+                            yield,
+                            price
+                    ));
                 }
+                loopYear = endYear;
+                pieceWiseFile.append("\n" + cropValue.name + ": X-Year, Y-Price\n" + MakeStringSortingByX(xAndYValues_Crop_Price));
+                pieceWiseFile.append("\n" + cropValue.name + ": X-Year, Y-Yield\n" + MakeStringSortingByX(xAndYValues_State_Yield));
             }
-
         }
-        finalContent.append("end %MLPQ% ");
+        cultivationFile.append("end %MLPQ% ");
 
-        WriteToFile(finalContent.toString());
+//        WriteToFile(cultivationFile.toString(), "Cultivation.txt");
+
+        WriteToFile(pieceWiseFile.toString(), "Piecewise.txt");
+    }
+
+    private static StringBuilder MakeStringSortingByX(List<XAndY> xAndYValues) {
+        StringBuilder xAndYString = new StringBuilder();
+
+        xAndYString.append("X: [");
+        for (XAndY xValue : xAndYValues) {
+            xAndYString.append(xValue.x + ",");
+        }
+        xAndYString.append("]\n");
+
+        xAndYString.append("Y: [");
+        for (XAndY yValue : xAndYValues) {
+            xAndYString.append(yValue.y + ",");
+        }
+        xAndYString.append("]\n");
+        return xAndYString;
     }
 
     private static Hashtable<Integer, Crop> GenerateCropRange() {
@@ -121,13 +187,13 @@ public class Main {
         return String.format("Cultivation(StateID,CropID,Year,Yield)  :- StateID=%s, CropID=%s, Year=%s, Yield=%s, Price=%s. \n", stateId, cropId, year, yield, price);
     }
 
-    static void WriteToFile(String output) {
+    static void WriteToFile(String output, String fileName) {
         try {
-            File myObj = new File("output.txt");
+            File myObj = new File(fileName);
             if (myObj.createNewFile()) {
                 System.out.println("File created: " + myObj.getName());
                 System.out.println(output);
-                FileWriter myWriter = new FileWriter("output.txt");
+                FileWriter myWriter = new FileWriter(fileName);
                 myWriter.write(output);
                 myWriter.close();
             } else {
