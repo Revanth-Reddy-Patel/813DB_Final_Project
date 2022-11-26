@@ -10,7 +10,7 @@ Below are the id's for crops and states.
 
 
 
-CROPS:
+**CROPS**:
 
 1, Paddy
 2, Wheat
@@ -19,11 +19,7 @@ CROPS:
 5, Maize
 
 
- ID |  1| 2| 3| 4| 5| 6| 7| 8| 9| 10| 11| 12 |13
---- | --- |---|--- | --- |---|--- | --- |---|
-States | Uttar Pradesh | Madhya Pradesh | Punjab | Rajasthan | West Bengal | Haryana | Bihar| Maharashtra|Andhra Pradesh|Telangana|Tamil Nadu|Karnataka|Others
-
-STATES:
+**STATES**:
 
 1, Uttar Pradesh
 2, Madhya Pradesh
@@ -34,7 +30,7 @@ STATES:
 7, Bihar
 8, Maharashtra
 9, Andhra Pradesh
-10,Telangana
-11,Tamil Nadu
-12,Karnataka
-13,Others
+10, Telangana
+11, Tamil Nadu
+12, Karnataka
+13, Others
